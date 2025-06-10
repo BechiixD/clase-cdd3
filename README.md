@@ -12,7 +12,7 @@ Incluye:
 ## Instalacion
 Instalar directo desde GitHub:
 ```bash
-pip install git+https://github.com/BechiixD/datos-lib
+pip install git+https://github.com/BechiixD/datos_lib
 ```
 
 ---
