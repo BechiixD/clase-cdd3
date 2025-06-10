@@ -9,4 +9,5 @@ setup(
     ],
     author='Bechi',
     description='Libreria para analisis de datos y regresion',
+    url='https://github.com/BechiixD/datos_lib',
 )

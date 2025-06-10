@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api
 from statsmodels.regression.linear_model import Logit
-from milib.regresion.base import Regresion
+from datos_lib.regresion.base import Regresion
 import matplotlib.pyplot as plt
 import random
 
