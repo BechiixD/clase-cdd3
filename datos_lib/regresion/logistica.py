@@ -31,40 +31,36 @@ class RegresionLogistica(Regresion):
         return Logit(y, X)
     def graficar_dispersion(self, column=0) -> None:
         """
-        Grafica un diagrama de dispersión para una variable predictora contra y,
-        junto con la curva logística ajustada.
-
-        Args:
-            column (int): Índice de la columna de X a usar como eje x.
-
-        Returns:
-            None
+        Grafica los datos (X vs y) y la curva logística predicha para una variable.
         """
         if self.adjusted_model is None:
             self.ajustar_modelo()
 
-        # Obtener variable predictora
         x_data = self.X.iloc[:, column]
         col_name = self.X.columns[column]
 
-        # Valores para graficar la curva
+        # Generar muchos valores de x para graficar la curva
         x_vals = np.linspace(x_data.min(), x_data.max(), 300)
-        
-        # Calcular z = b0 + b1 * x (solo si hay una sola variable explicativa)
-        betas = self.adjusted_model.params
-        z = betas["const"] + betas[col_name] * x_vals
 
-        # Curva logística
-        y_vals = 1 / (1 + np.exp(-z))
+        # Crear DataFrame para pasar al modelo
+        X_pred = pd.DataFrame({col_name: x_vals})
+        X_pred = statsmodels.api.add_constant(X_pred)
 
-        # Graficar
-        plt.scatter(x_data, self.y, color='blue', label='Datos')
+        # Obtener probabilidades predichas
+        y_vals = self.adjusted_model.predict(X_pred)
+
+        # Graficar datos reales (0s y 1s)
+        plt.scatter(x_data, self.y, color='blue', label='Datos reales', alpha=0.6)
+
+        # Graficar curva logística
         plt.plot(x_vals, y_vals, color='red', label='Curva logística')
         plt.xlabel(col_name)
-        plt.ylabel("Probabilidad")
+        plt.ylabel("Probabilidad de y = 1")
         plt.title("Regresión Logística")
         plt.legend()
+        plt.grid(True)
         plt.show()
+
 
     def ajustar_modelo(self):
         return super().ajustar_modelo()
