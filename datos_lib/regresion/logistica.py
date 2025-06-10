@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import statsmodels.api
-from statsmodels.regression.linear_model import Logit
+from statsmodels.discrete.discrete_model import Logit
 from datos_lib.regresion.base import Regresion
 import matplotlib.pyplot as plt
 import random
