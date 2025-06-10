@@ -34,24 +34,23 @@ class RegresionLogistica(Regresion):
         if self.adjusted_model is None:
             self.ajustar_modelo()
 
+        # 1) scatter
         x_data = self.X.iloc[:, column]
         col_name = self.X.columns[column]
+        plt.scatter(x_data, self.y, color='blue', label='Datos reales', alpha=0.6)
 
+        # 2) generar rango de X y predecir
         x_vals = np.linspace(x_data.min(), x_data.max(), 300)
         X_pred = pd.DataFrame({col_name: x_vals})
-        X_pred = statsmodels.api.add_constant(X_pred)
+        X_pred = statsmodels.api.add_constant(X_pred, has_constant='add')
+        y_pred = self.adjusted_model.predict(X_pred)
 
-        # Predecir probabilidades
-        y_vals = self.adjusted_model.predict(X_pred)
-
-        # Ordenar x_vals y y_vals en conjunto
+        # ordenar ambos para que la curva sea creciente
         orden = np.argsort(x_vals)
-        x_vals_ordenado = x_vals[orden]
-        y_vals_ordenado = y_vals[orden]
+        x_ord = x_vals[orden]
+        y_ord = y_pred[orden]
 
-        # Graficar
-        plt.scatter(x_data, self.y, color='blue', label='Datos reales', alpha=0.6)
-        plt.plot(x_vals_ordenado, y_vals_ordenado, color='red', label='Curva logística')
+        plt.plot(x_ord, y_ord, color='red', label='Curva logística')
         plt.xlabel(col_name)
         plt.ylabel("Probabilidad de y = 1")
         plt.title("Regresión Logística")
