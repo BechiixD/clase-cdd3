@@ -3,12 +3,35 @@ from scipy.stats import norm, uniform
 
 class GeneradorDatos:
   def __init__(self, n):
+    '''
+    Inicializa la clase con el número de datos a generar.
+    Args:
+      n (int): Número de datos a generar.
+    '''
+    if not isinstance(n, int) or n <= 0:
+      raise ValueError("n debe ser un entero positivo.")
     self.n = n
 
   def generar_datos_dist_norm(self, mu=0, sigma=1):
+    '''
+    Genera datos de una distribución normal.
+    Args:
+      mu (float): Media de la distribución normal. Por defecto 0.
+      sigma (float): Desviación estándar de la distribución normal. Por defecto 1.
+    Returns:
+      np.ndarray: Array de datos generados de la distribución normal.
+    '''
     return np.random.normal(loc=mu, scale=sigma, size=self.n)
 
   def generar_datos_dist_bs(self, mu=0, sigma=1):
+    '''
+    Genera datos de una distribución bimodal.
+    Args:
+      mu (float): Media de la distribución normal. Por defecto 0.
+      sigma (float): Desviación estándar de la distribución normal. Por defecto 1.
+    Returns:
+      np.ndarray: Array de datos generados de la distribución bimodal.
+    '''
     u = np.random.uniform(size=(self.n,))
     y = np.zeros_like(u)
     ind = np.where(u > 0.5)[0]
@@ -32,6 +55,9 @@ class GeneradorDatos:
     return uniform.pdf(x, a=a, b=b)
 
   def pdf_bs(self, x):
+    '''
+    Densidad de probabilidad de una distribución bimodal.
+    '''
     densidad = 0.5 * norm.pdf(x, loc=0, scale=1)
     for j in range(5):
       densidad += 0.1 * norm.pdf(x, loc=j/2 - 1, scale=1/10)

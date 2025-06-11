@@ -23,6 +23,13 @@ class AnalisisDescriptivo:
     self.data = data
 
   def genera_histograma(self, h):
+    '''
+    Genera un histograma de los datos con un ancho de bin h.
+    Args:
+      h (float): Ancho del bin para el histograma.
+    Returns:
+      bins (np.ndarray): Bordes de los bins del histograma.
+      densidad (np.ndarray): Densidad de probabilidad en cada bin.'''
     self.h = h
     max_val = np.max(self.data)
     min_val = np.min(self.data)
@@ -38,6 +45,13 @@ class AnalisisDescriptivo:
     return bins, densidad
 
   def evalua_histograma(self, h, x):
+    '''
+    Evalúa la densidad del histograma en puntos x.
+    Args:
+      h (float): Ancho del bin para el histograma.
+      x (np.ndarray): Puntos donde se evalúa la densidad.
+    Returns:
+      densidad_x (np.ndarray): Densidad del histograma en los puntos x.'''
     self.h = h
     bins, densidad = self.genera_histograma(h)
     densidad_x = np.zeros_like(x, dtype=float)
@@ -64,7 +78,15 @@ class AnalisisDescriptivo:
     return (1 + x) * ((x >= -1) & (x <= 0)) + (1-x) * ((x >= 0) & (x <= 1))
 
   def densidad_nucleo(self, h, kernel, x_vals):
-
+    '''
+    Calcula la densidad usando un kernel específico.
+    Args:
+      h (float): Ancho del kernel.
+      kernel (str): Tipo de kernel a usar ('gaussiano', 'uniforme', 'cuadratico', 'triangular').
+      x_vals (np.ndarray): Puntos donde se evalúa la densidad.
+    Returns:
+      density (np.ndarray): Densidad estimada en los puntos x_vals.
+    '''
     n = len(self.data)
     density = np.zeros(len(x_vals), dtype=float)
 
@@ -83,10 +105,17 @@ class AnalisisDescriptivo:
 
     return density
 
-  def qqplot(self, newdata=None):
+  def qqplot(self, newdata=None) -> None:
+    '''
+    Genera un QQ plot de los datos.
+    Args:
+      newdata (array-like, optional): Datos nuevos para comparar. Si es None, usa self.data.
+    Returns:
+      None: Muestra el gráfico del QQ plot.
+    '''
 
     if (newdata == None):
-      newdata = self.data
+      newdata = self.X
 
     ## Completar
     data_sorted = sorted(newdata)

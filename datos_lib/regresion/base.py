@@ -4,6 +4,13 @@ import statsmodels.api as sm
 
 class Regresion:
     def __init__(self, X, y):
+        '''
+        Inicializa la clase de regresión con los datos X e y y los guarda.
+        Args:
+            X (pd.DataFrame, list, tuple, np.ndarray): Datos de ntrada (variables predictoras).
+                Deben tener un formato de matriz 2D (n filas (datos), m columnas (columnas)).
+            y (pd.Series, np.ndarray): Variable objetivo (respuesta).
+        '''
         self.X = self._make_df(X)
         self.y = pd.Series(y).reset_index(drop=True)
 
