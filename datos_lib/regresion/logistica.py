@@ -120,8 +120,9 @@ class RegresionLogistica(Regresion):
         max_p = 0
         max_j = 0
         for p in p_values:
-            y_pred = (temp_model.predict(X_te) >= p).astype(int)
-
+            Xc_te = sm.add_constant(X_te, has_constant='add')
+            y_pred = (temp_model.predict(Xc_te) >= p).astype(int)
+            
             si_si = sum((y_te == 'Yes') & (y_pred == 1))
             si_no = sum((y_te == 'Yes') & (y_pred == 0))
             no_si = sum((y_te == 'No') & (y_pred == 1))
