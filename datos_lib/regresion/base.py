@@ -80,7 +80,7 @@ class Regresion:
         Returns:
             dict: Predicciones con intervalo de confianza y predicción.
         """
-        Xn = self._prepare_X(X_new)
+        Xn = self._make_df(X_new)
         if len(Xn.columns) != len(self.X.columns):
             raise ValueError("X_new debe tener mismas columnas que X original después de dummies.")
         Xc = sm.add_constant(Xn, has_constant='add')

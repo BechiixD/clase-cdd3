@@ -62,20 +62,23 @@ class RegresionLineal(Regresion):
         plt.title("Regresión Lineal")
         plt.show()
 
-    def calcular_coeficiente_correlacion(self) -> float:
+    def calcular_coeficiente_correlacion(self, column: int = 0) -> float:
         """
-        Calcula el coeficiente de correlacion entre X y y.
+        Calcula el coeficiente de correlación de Pearson entre una columna de X y y.
+
+        Args:
+            column (int, optional): Índice de la columna de X a usar. Por defecto es 0.
 
         Returns:
-            Float: Coeficiente de correlación de Pearson.
+            float: Coeficiente de correlación de Pearson.
 
         Ejemplo:
             >>> reg = RegresionLineal(X, y)
-            >>> reg.calcular_coeficiente_correlacion()
-            # Esto devuelve el coeficiente de correlacion.
+            >>> reg.calcular_coeficiente_correlacion(column=1)
+            # Esto devuelve el coeficiente de correlación para la columna 1 de X.
         """
 
-        return np.corrcoef(self.X.iloc[:, 0], self.y)[0, 1]
+        return np.corrcoef(self.X.iloc[:, column], self.y)[0, 1]
 
     def ajustar_modelo(self):
         """

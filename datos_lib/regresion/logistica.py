@@ -69,7 +69,7 @@ class RegresionLogistica(Regresion):
         train, test = indices[:cut], indices[cut:]
         return train, test
 
-    def calcular_matriz_confusion(self, p: float, test_ratio: float = 0.2, seed: int = 1) -> dict:
+    def calcular_matriz_confusion(self, p: float = 0.5, test_ratio: float = 0.2, seed: int = 1) -> dict:
         """
         Calcula y muestra la matriz de confusión para la regresión logística.
 
@@ -125,13 +125,11 @@ class RegresionLogistica(Regresion):
             Xc_te = sm.add_constant(X_te, has_constant='add')
             y_pred = (temp_model.predict(Xc_te) >= p).astype(int)
             
-            si_si = sum((y_te == 'Yes') & (y_pred == 1))
-            si_no = sum((y_te == 'Yes') & (y_pred == 0))
-            no_si = sum((y_te == 'No') & (y_pred == 1))
-            no_no = sum((y_te == 'No') & (y_pred == 0))
+            tp = sum((y_te==1)&(y_pred==1)); tn = sum((y_te==0)&(y_pred==0))
+            fp = sum((y_te==0)&(y_pred==1)); fn = sum((y_te==1)&(y_pred==0))
 
-            sens = si_si / (si_si + si_no) if (si_si + si_no) > 0 else 0
-            espec = no_no / (no_no + no_si) if (no_no + no_si) > 0 else 0
+            sens = tp / (tp + fn) if (tp + fn) > 0 else 0
+            espec = tn / (tn + fp) if (tn + fp) > 0 else 0
 
             sensibilidad.append(sens)
             especificidad.append(espec)
