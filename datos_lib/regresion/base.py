@@ -16,6 +16,8 @@ class Regresion:
         # Si es DataFrame, lo uso directo
         if isinstance(X, pd.DataFrame):
             df = X.copy()
+        elif isinstance(X, pd.Series):
+            X = X.to_frame()
         # Si es lista/array de 2D, lo paso a DataFrame
         elif isinstance(X, (list, tuple, np.ndarray)):
             arr = np.array(X)
