@@ -91,8 +91,7 @@ class Regresion:
         if len(Xn.columns) != len(self.X.columns):
             raise ValueError("X_new debe tener mismas columnas que X original después de dummies.")
         Xc = sm.add_constant(Xn, has_constant='add')
-        pred = self.adjusted_model.get_prediction(Xc).summary_frame(alpha=alpha)
-        summary = pred.summary_frame()
+        summary = self.adjusted_model.get_prediction(Xc).summary_frame(alpha=alpha)
 
         return {
             "res": summary["mean"].iloc[0],
