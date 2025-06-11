@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import statsmodels.api
+import statsmodels.api as sm
 from statsmodels.discrete.discrete_model import Logit
 from datos_lib.regresion.base import Regresion
 import matplotlib.pyplot as plt
@@ -8,7 +8,7 @@ import random
 
 
 class RegresionLogistica(Regresion):
-    def modelo(self, X: pd.DataFrame, y: np.ndarray) -> Logit:
+    def modelo(self, Xc: pd.DataFrame, y: np.ndarray) -> Logit:
         """
         Devuelve el modelo de regresión logística de statsmodels.
 
@@ -24,36 +24,27 @@ class RegresionLogistica(Regresion):
             >>> model = reg.modelo(pd.DataFrame(X), np.array(y))
             >>> results = model.fit()
         """
-        X = pd.DataFrame(X) if X is not None else statsmodels.api.add_constant(self.X)
-        y = np.array(y) if y is not None else self.y
         if not np.all(np.isin(y, [0, 1])):
             raise ValueError("y debe contener solo 0 y 1 para regresión logística.")
-        return Logit(y, X)
+        return Logit(y, Xc)
     
     def graficar_dispersion(self, column=0) -> None:
         if self.adjusted_model is None:
             self.ajustar_modelo()
 
-        x_data = self.X.iloc[:, column]
-        col_name = self.X.columns[column]
-        plt.scatter(x_data, self.y, color='blue', label='Datos reales', alpha=0.6)
-
-        x_vals = np.linspace(x_data.min(), x_data.max(), 300)
-        X_pred = pd.DataFrame({col_name: x_vals})
-        X_pred = statsmodels.api.add_constant(X_pred, has_constant='add')
-        y_pred = self.adjusted_model.predict(X_pred)
-
-        orden = np.argsort(x_vals)
-        x_ord = x_vals[orden]
-        y_ord = y_pred[orden]
-
-        plt.plot(x_ord, y_ord, color='red', label='Curva logística')
-        plt.xlabel(col_name)
-        plt.ylabel("Probabilidad de y = 1")
-        plt.title("Regresión Logística")
-        plt.legend()
-        plt.grid(True)
-        plt.show()
+        col = self.X.columns[column]
+        x = self.X[col]
+        plt.scatter(x, self.y, color='blue', alpha=0.6, label='Datos')
+        xs = np.linspace(x.min(), x.max(), 300)
+        # preparar con medias en otras variables
+        X_pred = pd.DataFrame({c: np.repeat(self.X[c].mean(), len(xs)) for c in self.X.columns})
+        X_pred[col] = xs
+        Xc = sm.add_constant(X_pred, has_constant='add')
+        ys = self.adjusted_model.predict(Xc)
+        idx = np.argsort(xs)
+        plt.plot(xs[idx], ys[idx], color='red', label='Curva logística')
+        plt.xlabel(col); plt.ylabel('Probabilidad y=1'); plt.title('Regresión Logística')
+        plt.legend(); plt.grid(True); plt.show()
 
     def ajustar_modelo(self):
         return super().ajustar_modelo()
@@ -70,44 +61,20 @@ class RegresionLogistica(Regresion):
         Returns:
             None
         """
-        n = self.X.shape[0]
-        n_train = int(n * (1 - test_ratio))
+        n = len(self.y)
+        indices = list(range(n))
         random.seed(seed)
-        train_indices = random.sample(range(n), n_train)
-        test_indices = list(set(range(n)) - set(train_indices))
-
-        X_train = self.X.iloc[train_indices]
-        y_train = self.y[train_indices]
-        X_test = self.X.iloc[test_indices]
-        y_test = self.y[test_indices]
-
-        # Ajustar modelo con datos de entrenamiento
-        X_train_const = statsmodels.api.add_constant(X_train)
-        model = self.modelo(X_train_const, y_train)
-        results = model.fit()
-
-        # Predecir con datos de prueba
-        X_test_const = statsmodels.api.add_constant(X_test)
-        y_pred_prob = results.predict(X_test_const)
-        y_pred = (y_pred_prob >= p).astype(int)
-
-        # Calcular matriz de confusión (asumiendo y es 0/1)
-        si_si = sum((y_test == 1) & (y_pred == 1))
-        si_no = sum((y_test == 1) & (y_pred == 0))
-        no_si = sum((y_test == 0) & (y_pred == 1))
-        no_no = sum((y_test == 0) & (y_pred == 0))
-
-        sensibilidad = si_si / (si_si + si_no)
-        falso_negativo = si_no / (si_si + si_no)
-        falso_positivo = no_si / (no_si + no_no)
-        especificidad = no_no / (no_si + no_no)
-        error_clasificacion = (si_no + no_si) / n
-
-        return {
-            "sensibilidad": sensibilidad,
-            "falso_negativo": falso_negativo,
-            "falso_positivo": falso_positivo,
-            "especificidad": especificidad,
-            "error_clasificacion": error_clasificacion
-        }
+        random.shuffle(indices)
+        cut = int(n*(1-test_ratio))
+        train, test = indices[:cut], indices[cut:]
+        X_tr, y_tr = self.X.iloc[train], self.y.iloc[train]
+        X_te, y_te = self.X.iloc[test], self.y.iloc[test]
+        Xc_tr = sm.add_constant(X_tr, has_constant='add')
+        res = self.modelo(Xc_tr, y_tr).fit()
+        Xc_te = sm.add_constant(X_te, has_constant='add')
+        y_prob = res.predict(Xc_te)
+        y_pred = (y_prob>=p).astype(int)
+        tp = sum((y_te==1)&(y_pred==1)); tn = sum((y_te==0)&(y_pred==0))
+        fp = sum((y_te==0)&(y_pred==1)); fn = sum((y_te==1)&(y_pred==0))
+        return {'sens':tp/(tp+fn), 'spec':tn/(tn+fp), 'error':(fp+fn)/len(y_te)}
     
