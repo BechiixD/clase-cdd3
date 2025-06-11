@@ -43,11 +43,12 @@ print("Predicción para x=5:", predicciones)
 
 ---
 ## Requisitos
-- Python 3.8+
-- numpy
-- pandas
-- matplotlib
-- scikit-learn
+- numpy>=1.19.0
+- pandas>=1.1.0
+- scipy>=1.5.0
+- matplotlib>=3.3.0
+- statsmodels>=0.12.0
+- sklearn>=0.24.0
 
 Instalalos con:
 ```bash
