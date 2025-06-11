@@ -22,7 +22,7 @@ class AnalisisDescriptivo:
   def __init__(self, data: np.ndarray) -> None:
     self.data = data
 
-  def genera_histograma(self, h: float) -> Tuple[np.ndarray, np.ndarray]:
+  def genera_histograma(self, h: float) -> tuple:
     '''
     Genera un histograma de los datos con un ancho de bin h.
     Args:
