@@ -117,6 +117,8 @@ class AnalisisDescriptivo:
     '''
 
     if newdata is not None:
+      if not isinstance(newdata, (list, np.ndarray)):
+        raise TypeError("newdata debe ser una lista o un array de numpy.")
       data = newdata
     else:
       data = self.data
