@@ -113,7 +113,7 @@ class RegresionLogistica(Regresion):
 
         # Ajustar el modelo con los datos de entrenamiento
         Xc_tr = sm.add_constant(X_tr, has_constant='add')
-        temp_model = self.modelo(Xc_tr, y_tr).fit()
+        temp_model = sm.self.modelo(Xc_tr, y_tr).fit()
         # Inicializar listas para almacenar sensibilidad y especificidad
         sensibilidad = []
         especificidad = []
