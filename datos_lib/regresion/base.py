@@ -4,36 +4,36 @@ import statsmodels.api as sm
 
 class Regresion:
     def __init__(self, X, y):
-        # 1) Preparo X como DataFrame
         self.X = self._make_df(X)
-        # 2) Chequeo que X e y tengan la misma longitud
-        if len(self.X) != len(y):
-            raise ValueError(f"X e y deben tener el mismo número de filas: {len(self.X)} vs {len(y)}")
-        # 3) Guardo y como Series
         self.y = pd.Series(y).reset_index(drop=True)
+
+        if len(self.X) != len(self.y):
+            raise ValueError(f"X e y deben tener el mismo número de filas: {len(self.X)} vs {len(self.y)}")
+
         self.adjusted_model = None
 
     def _make_df(self, X):
-        # a) Si ya es DataFrame, lo copio
+        # Si es DataFrame, lo uso directo
         if isinstance(X, pd.DataFrame):
             df = X.copy()
-        # b) Si es dict, lo paso a DataFrame
-        elif isinstance(X, dict):
-            df = pd.DataFrame(X)
-        # c) Si es lista/tupla o array, stackeo columnas
-        else:
+        # Si es lista/array de 2D, lo paso a DataFrame
+        elif isinstance(X, (list, tuple, np.ndarray)):
             arr = np.array(X)
-            if arr.ndim == 1:
-                arr = np.column_stack([arr])
+            if arr.ndim != 2:
+                raise ValueError("X debe ser una matriz 2D (n filas, m columnas)")
             df = pd.DataFrame(arr, columns=[f"x{i}" for i in range(1, arr.shape[1]+1)])
-        # d) Quito cualquier columna 'const' residual
+        else:
+            raise TypeError("X debe ser un DataFrame, lista de listas o array 2D")
+
+        # Elimino 'const' si está
         if "const" in df.columns:
             df = df.drop(columns="const")
-        # e) Convierto categóricas u object en dummies
-        df = df.infer_objects() 
+
+        # Convierte variables categóricas en dummies
         cat = df.select_dtypes(include=["object", "category"]).columns
         if len(cat):
             df = pd.get_dummies(df, columns=cat, drop_first=True, dtype=int)
+
         return df.reset_index(drop=True)
         
     def modelo(self, X: pd.DataFrame, y: np.ndarray) -> 'statsmodels.base.model.Model':
