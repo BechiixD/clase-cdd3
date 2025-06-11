@@ -4,26 +4,35 @@ import statsmodels.api
 
 class Regresion:
     def __init__(self, X, y):
-        """
-        Inicializa la clase con los datos predictivos y la variable respuesta.
-
-        Args:
-            X: Datos predictivos (puede ser lista, array, dict, etc.).
-            y: Variable respuesta (array-like).
-
-        Raises:
-            ValueError: Si X no se puede convertir a DataFrame o está vacío.
-        """
-        try:
-            self.X = pd.DataFrame(X)
-            if self.X.empty or self.X.shape[1] == 0:
-                raise ValueError("El DataFrame resultante está vacío o no tiene columnas.")
-        except Exception as e:
-            raise ValueError(f"No se pudo convertir X a DataFrame: {str(e)}. Asegúrate de que X sea un diccionario, lista, array de numpy, etc.")
-
-        self.y = y
+        # 1) forzar X limpio y con dummies si hay categorías
+        self.X = self._prepare_X(X)
+        # 2) y siempre Series
+        self.y = pd.Series(y).reset_index(drop=True)
         self.adjusted_model = None
 
+    def _prepare_X(self, X):
+        # convierte X a DataFrame, quita constant, genera dummies y resetea índices
+        if isinstance(X, pd.DataFrame):
+            df = X.copy()
+        elif isinstance(X, dict):
+            df = pd.DataFrame(X)
+        else:
+            arr = np.array(X)
+            if arr.ndim == 1:
+                arr = arr.reshape(-1, 1)
+            df = pd.DataFrame(arr, columns=[f"x{i}" for i in range(arr.shape[1])])
+
+        # detectar y convertir categóricas a dummies
+        for col in df.select_dtypes(include=['object', 'category']).columns:
+            dummies = pd.get_dummies(df[col], prefix=col, drop_first=True)
+            df = df.drop(columns=col).join(dummies)
+
+        # quitar si ya existe constante
+        if 'const' in df.columns:
+            df = df.drop(columns='const')
+
+        return df.reset_index(drop=True)
+    
     def modelo(self, X: pd.DataFrame, y: np.ndarray) -> 'statsmodels.base.model.Model':
         """
         Este método se sobreescribe en subclases

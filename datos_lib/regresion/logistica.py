@@ -34,18 +34,15 @@ class RegresionLogistica(Regresion):
         if self.adjusted_model is None:
             self.ajustar_modelo()
 
-        # 1) scatter
         x_data = self.X.iloc[:, column]
         col_name = self.X.columns[column]
         plt.scatter(x_data, self.y, color='blue', label='Datos reales', alpha=0.6)
 
-        # 2) generar rango de X y predecir
         x_vals = np.linspace(x_data.min(), x_data.max(), 300)
         X_pred = pd.DataFrame({col_name: x_vals})
         X_pred = statsmodels.api.add_constant(X_pred, has_constant='add')
         y_pred = self.adjusted_model.predict(X_pred)
 
-        # ordenar ambos para que la curva sea creciente
         orden = np.argsort(x_vals)
         x_ord = x_vals[orden]
         y_ord = y_pred[orden]
