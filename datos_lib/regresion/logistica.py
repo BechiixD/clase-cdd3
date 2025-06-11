@@ -118,7 +118,9 @@ class RegresionLogistica(Regresion):
         sensibilidad = []
         especificidad = []
         max_p = 0
-        max_j = 0
+        max_j = -np.inf
+        max_sensibilidad = 0
+        max_especificidad = 0
         for p in p_values:
             Xc_te = sm.add_constant(X_te, has_constant='add')
             y_pred = (temp_model.predict(Xc_te) >= p).astype(int)
