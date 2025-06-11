@@ -113,7 +113,7 @@ class RegresionLogistica(Regresion):
 
         # Ajustar el modelo con los datos de entrenamiento
         Xc_tr = sm.add_constant(X_tr, has_constant='add')
-        temp_model = sm.self.modelo(Xc_tr, y_tr).fit()
+        temp_model = self.modelo(Xc_tr, y_tr).fit()
         # Inicializar listas para almacenar sensibilidad y especificidad
         sensibilidad = []
         especificidad = []
@@ -140,13 +140,13 @@ class RegresionLogistica(Regresion):
                 max_sensibilidad = sens
                 max_especificidad = espec
 
-            return {
-                'sensibilidad': sensibilidad,
-                'especificidad': especificidad,
-                'corte_optimo': max_p,
-                'sensibilidad_optima': max_sensibilidad,
-                'especificidad_optima': max_especificidad
-            }
+        return {
+            'sensibilidad': sensibilidad,
+            'especificidad': especificidad,
+            'corte_optimo': max_p,
+            'sensibilidad_optima': max_sensibilidad,
+            'especificidad_optima': max_especificidad
+        }
         
     def graficar_corte_optimo(self, n: int = 100, test_ratio: float = 0.2, seed: int = 1) -> None:
         """
