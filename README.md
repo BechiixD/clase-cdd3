@@ -26,19 +26,21 @@ data = [1, 2, 3, 4, 5, 6]
 ad = AnalisisDescriptivo(data)
 
 # Histograma
-bins, densidad = ad.genera_histograma(bins=3)
+bins, densidad = ad.genera_histograma(h=2)
 print("Bins:", bins)
 print("Densidad:", densidad)
 
 # --- Regresión Lineal ---
-X = [[1], [2], [3], [4]]
-y = [2, 3, 4, 5]
+X = np.column_stack([[1,2,3,4], [7,6,5,4]])
+y = [5,2,4,3]
 
-modelo = RegresionLineal(X, y)
-modelo.ajustar_modelo()
+model = RegresionLineal(X, y)
+model.ajustar_modelo()
 
-predicciones = modelo.predecir([[5]])
-print("Predicción para x=5:", predicciones)
+X_pred = np.column_stack([5,5])
+predicciones = model.predecir(X_pred)
+print(model.graficar_dispersion())
+print("Predicción para [5,5]:", predicciones)
 ```
 
 ---

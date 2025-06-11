@@ -19,17 +19,18 @@ class AnalisisDescriptivo:
     densidad_nucleo(h, kernel, x_vals): Calcula la densidad usando un kernel específico.
     qqplot(newdata=None): Genera un QQ plot de los datos.
   '''
-  def __init__(self, data):
+  def __init__(self, data: np.ndarray) -> None:
     self.data = data
 
-  def genera_histograma(self, h):
+  def genera_histograma(self, h: float) -> Tuple[np.ndarray, np.ndarray]:
     '''
     Genera un histograma de los datos con un ancho de bin h.
     Args:
       h (float): Ancho del bin para el histograma.
     Returns:
       bins (np.ndarray): Bordes de los bins del histograma.
-      densidad (np.ndarray): Densidad de probabilidad en cada bin.'''
+      densidad (np.ndarray): Densidad de probabilidad en cada bin.
+    '''
     self.h = h
     max_val = np.max(self.data)
     min_val = np.min(self.data)
@@ -44,14 +45,15 @@ class AnalisisDescriptivo:
     # frecuencia en escala de densidad
     return bins, densidad
 
-  def evalua_histograma(self, h, x):
+  def evalua_histograma(self, h: float, x: np.ndarray) -> np.ndarray:
     '''
     Evalúa la densidad del histograma en puntos x.
     Args:
       h (float): Ancho del bin para el histograma.
       x (np.ndarray): Puntos donde se evalúa la densidad.
     Returns:
-      densidad_x (np.ndarray): Densidad del histograma en los puntos x.'''
+      densidad_x (np.ndarray): Densidad del histograma en los puntos x.
+    '''
     self.h = h
     bins, densidad = self.genera_histograma(h)
     densidad_x = np.zeros_like(x, dtype=float)
@@ -64,20 +66,20 @@ class AnalisisDescriptivo:
           break
 
     return densidad_x
-
-  def kernel_gaussiano(self, x):
+  
+  def kernel_gaussiano(self, x: np.ndarray) -> np.ndarray:
     return (1 / np.sqrt(2 * np.pi)) * np.exp((-1/2) * x**2)
 
-  def kernel_uniforme(self, x):
+  def kernel_uniforme(self, x: np.ndarray) -> np.ndarray:
     return np.where(((x > -1/2) & (x < 1/2)), 1, 0)
 
-  def kernel_cuadratico(self, x):
+  def kernel_cuadratico(self, x: np.ndarray) -> np.ndarray:
     return 3 / 4 * (1 - x**2) * ((x >= -1) & (x <= 1))
 
-  def kernel_triangular(self, x):
+  def kernel_triangular(self, x: np.ndarray) -> np.ndarray:
     return (1 + x) * ((x >= -1) & (x <= 0)) + (1-x) * ((x >= 0) & (x <= 1))
 
-  def densidad_nucleo(self, h, kernel, x_vals):
+  def densidad_nucleo(self, h: float, kernel: str, x_vals: np.ndarray) -> np.ndarray:
     '''
     Calcula la densidad usando un kernel específico.
     Args:
@@ -105,7 +107,7 @@ class AnalisisDescriptivo:
 
     return density
 
-  def qqplot(self, newdata=None) -> None:
+  def qqplot(self, newdata: np.ndarray = None) -> None:
     '''
     Genera un QQ plot de los datos.
     Args:
@@ -114,17 +116,19 @@ class AnalisisDescriptivo:
       None: Muestra el gráfico del QQ plot.
     '''
 
-    if (newdata == None):
-      newdata = self.X
+    if newdata is not None:
+      data = newdata
+    else:
+      data = self.data
 
     ## Completar
-    data_sorted = sorted(newdata)
-    data_mean = newdata.mean()
-    data_std = newdata.std()
+    data_sorted = sorted(data)
+    data_mean = data.mean()
+    data_std = data.std()
 
     cuantiles_muestrales = (data_sorted - data_mean) / data_std
 
-    probabilidades = np.arange(1/(len(newdata) + 1), 1, 1/(len(newdata) + 1))
+    probabilidades = np.arange(1/(len(data) + 1), 1, 1/(len(data) + 1))
     cuantiles_teoricos = norm.ppf(probabilidades)
 
     plt.scatter(cuantiles_teoricos, cuantiles_muestrales, color='blue', marker='o')
