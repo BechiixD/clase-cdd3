@@ -4,35 +4,36 @@ import statsmodels.api as sm
 
 class Regresion:
     def __init__(self, X, y):
-        # X siempre DataFrame limpio y sin 'const'
-        self.X = self._prepare_X(X)
-        # y siempre Series alineada
+        # 1) Preparo X como DataFrame
+        self.X = self._make_df(X)
+        # 2) Chequeo que X e y tengan la misma longitud
+        if len(self.X) != len(y):
+            raise ValueError(f"X e y deben tener el mismo número de filas: {len(self.X)} vs {len(y)}")
+        # 3) Guardo y como Series
         self.y = pd.Series(y).reset_index(drop=True)
-        if len(self.X) != len(self.y):
-            raise ValueError(f"X e y deben tener igual número de filas. got {len(self.X)} vs {len(self.y)}")
         self.adjusted_model = None
 
-    def _prepare_X(self, X):
-        # convierte X a DataFrame, quita constante y genera dummies
+    def _make_df(self, X):
+        # a) Si ya es DataFrame, lo copio
         if isinstance(X, pd.DataFrame):
-            df = X.copy().reset_index(drop=True)
+            df = X.copy()
+        # b) Si es dict, lo paso a DataFrame
         elif isinstance(X, dict):
             df = pd.DataFrame(X)
+        # c) Si es lista/tupla o array, stackeo columnas
         else:
             arr = np.array(X)
-            # si es lista de arrays columnas, stack
-            if arr.dtype == 'object' and isinstance(X, (list, tuple)):
-                arr = np.column_stack(X)
             if arr.ndim == 1:
-                arr = arr.reshape(-1, 1)
-            df = pd.DataFrame(arr, columns=[f"x{i}" for i in range(arr.shape[1])])
-        # dummies para categóricas
-        cats = df.select_dtypes(include=['object', 'category']).columns
-        for col in cats:
-            dummies = pd.get_dummies(df[col], prefix=col, drop_first=True)
-            df = df.drop(columns=col).join(dummies)
-        # quitar 'const'
-        df = df.drop(columns=[c for c in df.columns if c.lower()=='const'], errors='ignore')
+                arr = np.column_stack([arr])
+            df = pd.DataFrame(arr, columns=[f"x{i}" for i in range(1, arr.shape[1]+1)])
+        # d) Quito cualquier columna 'const' residual
+        if "const" in df.columns:
+            df = df.drop(columns="const")
+        # e) Convierto categóricas u object en dummies
+        df = df.infer_objects() 
+        cat = df.select_dtypes(include=["object", "category"]).columns
+        if len(cat):
+            df = pd.get_dummies(df, columns=cat, drop_first=True, dtype=int)
         return df.reset_index(drop=True)
         
     def modelo(self, X: pd.DataFrame, y: np.ndarray) -> 'statsmodels.base.model.Model':

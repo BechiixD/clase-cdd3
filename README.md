@@ -1,4 +1,4 @@
-# 📊 datos-lib
+# 📊 datos_lib
 
 Una libreria de Python simple y modular para realizar analisis de datos clasicos.
 Incluye:
