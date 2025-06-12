@@ -14,6 +14,12 @@ Instalar directo desde GitHub:
 ```bash
 !pip install git+https://github.com/BechiixD/datos_lib
 ```
+O creando un entorno virtual con ```venv```
+```py
+python3 -m venv venv
+source venv/bin/activate
+pip install git+https://github.com/BechiixD/datos_lib
+```
 
 ---
 
